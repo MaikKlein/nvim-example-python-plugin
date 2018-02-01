@@ -9,3 +9,9 @@ class Main(object):
     def doItPython(self, args):
         self.vim.command('echo "hello from DoItPython"')
 
+    @neovim.command("DoItPythonCmd", range='', nargs='*')
+    def doItPythonCmd(self, args, rage):
+        self.doItPython()
+        
+
+
