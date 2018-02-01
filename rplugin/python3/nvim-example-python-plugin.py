@@ -1,20 +1,33 @@
+import neovim
+
 @neovim.plugin
-class TestPlugin(object):
+class Limit(object):
+    def __init__(self, vim):
+        self.vim = vim
+        self.calls = 0
 
-    def __init__(self, nvim):
-        self.nvim = nvim
+    @neovim.command('Cmd', range='', nargs='*', sync=True)
+    def command_handler(self, args, range):
+        self._increment_calls()
+        self.vim.current.line = (
+            'Command: Called %d times, args: %s, range: %s' % (self.calls,
+                                                               args,
+                                                               range))
 
-    @neovim.function("TestFunction", sync=True)
-    def testfunction(self, args):
-        return 3
+    @neovim.autocmd('BufEnter', pattern='*.py', eval='expand("<afile>")',
+                    sync=True)
+    def autocmd_handler(self, filename):
+        self._increment_calls()
+        self.vim.current.line = (
+            'Autocmd: Called %s times, file: %s' % (self.calls, filename))
 
-    @neovim.command("TestCommand", range='', nargs='*')
-    def testcommand(self, args, range):
-        self.nvim.current.line = ('Command with args: {}, range: {}'
-                                  .format(args, range))
+    @neovim.function('Func')
+    def function_handler(self, args):
+        self._increment_calls()
+        self.vim.current.line = (
+            'Function: Called %d times, args: %s' % (self.calls, args))
 
-    @neovim.autocmd('BufEnter', pattern='*.py', eval='expand("<afile>")', sync=True)
-    def on_bufenter(self, filename):
-        self.nvim.out_write("testplugin is in " + filename + "\n")
-
-
+    def _increment_calls(self):
+        if self.calls == 5:
+            raise Exception('Too many calls!')
+        self.calls += 1
