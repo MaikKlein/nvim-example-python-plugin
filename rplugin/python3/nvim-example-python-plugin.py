@@ -6,6 +6,10 @@ class Limit(object):
         self.vim = vim
         self.calls = 0
 
+    @neovim.command('HelloWorld', range='', nargs='*', sync=True)
+    def hello_world(self, args, range):
+        self.vim.command('echo Hello World')
+
     @neovim.command('Cmd', range='', nargs='*', sync=True)
     def command_handler(self, args, range):
         self._increment_calls()
