@@ -1,17 +1,20 @@
-import neovim
-
 @neovim.plugin
-class Main(object):
-    def __init__(self, vim):
-        self.vim = vim
+class TestPlugin(object):
 
-    @neovim.function('DoItPython')
-    def doItPython(self, args):
-        self.vim.command('echo "hello from DoItPython"')
+    def __init__(self, nvim):
+        self.nvim = nvim
 
-    @neovim.command("DoItPythonCmd", range='', nargs='*')
-    def doItPythonCmd(self, args, rage):
-        self.doItPython()
-        
+    @neovim.function("TestFunction", sync=True)
+    def testfunction(self, args):
+        return 3
+
+    @neovim.command("TestCommand", range='', nargs='*')
+    def testcommand(self, args, range):
+        self.nvim.current.line = ('Command with args: {}, range: {}'
+                                  .format(args, range))
+
+    @neovim.autocmd('BufEnter', pattern='*.py', eval='expand("<afile>")', sync=True)
+    def on_bufenter(self, filename):
+        self.nvim.out_write("testplugin is in " + filename + "\n")
 
 
